@@ -16,7 +16,12 @@
 ;=> NIL, NIL
 "
   (let ((osstr (make-string-output-stream)))
-    (uiop:run-program (concatenate 'string "nslookup " name) :output osstr :ignore-error-status t)
+    (uiop:run-program (concatenate 'string "nslookup " name) :output osstr :ignore-error-status t
+		      :external-format (cond
+					 ((uiop:os-windows-p) :cp1251) 
+					 (t uiop/stream:*utf-8-external-format*)
+					 ) 
+		      )
     (let ((isstr  (make-string-input-stream (get-output-stream-string osstr)))
 	  (lst nil)
 	  (rez nil)
