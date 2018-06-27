@@ -80,3 +80,13 @@
  *rez*)
 
 (allowed-address-list)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun ip-by-name (name)
+  (format nil "~{~A~^.~}"
+	  (loop for i across
+	       (sb-bsd-sockets:host-ent-address
+		(sb-bsd-sockets:get-host-by-name name))
+	     collect i)))
+
