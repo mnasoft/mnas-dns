@@ -1,8 +1,4 @@
-;;;; mnas-dns.lisp
-
 (in-package #:mnas-dns)
-
-;;; "mnas-dns" goes here. Hacks and glory await!
 
 (defun ip-by-name (name)
   "Выполняет определение IP-адреса ПК по его имени;
@@ -45,7 +41,42 @@
 	  (if (or (string= (first i) "Имя")
 		  (string= (first i) "Name"))
 	      (setf nm (second i)))
-	  (if (and nm  (string= (first i) "Address"))
+	  (if (and nm  (or (string= (first i) "Address")
+			   (string= (first i) "Addresses")))
 	      (setf addres (second i)
 		    addres-lst (cons addres addres-lst)
 		    nm-lst (cons nm nm-lst))))))))
+
+
+(progn
+  (defparameter *os*
+    (let ((name "n133619")
+	  (osstr (make-string-output-stream)))
+      (uiop:run-program
+       (concatenate 'string "nslookup " name) :output osstr :ignore-error-status t
+       :external-format (cond
+			  ((uiop:os-windows-p) :cp1251) 
+			  (t uiop/stream:*utf-8-external-format*)))
+      osstr))
+
+  (defparameter *is* (make-string-input-stream (get-output-stream-string *os*)))
+
+  (defparameter *rez*
+    (let ((lines nil)
+	  (isstr *is*))
+      (do ((line (read-line isstr nil 'eof)
+		 (read-line isstr nil 'eof)))
+	  ((eql line 'eof) (mapcar #'(lambda (el) (string-trim "" el) ) (reverse lines))) 
+	(push line lines))))
+  )
+
+(defun filter (str lst)
+  (loop for i in lst when (if (string/= str i) i nil) collect it))
+
+(require :str)
+(mapcar
+ #'(lambda (el)
+     (filter "" (str:split " " el)))
+ *rez*)
+
+(allowed-address-list)
