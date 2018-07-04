@@ -5,7 +5,7 @@
 ;;; "mnas-dns" goes here. Hacks and glory await!
 
 (defun ip-by-name (name)
-    "Выполняет определение IP-адреса ПК по его имени;
+  "Выполняет определение IP-адреса ПК по его имени;
 Возвращает:
 первое значение - список IP-адресов, соответствующих данному имени name или NIL;
 второе значение - список имен, соответствующих данному имени name или NIL;
@@ -15,12 +15,12 @@
 ;(ip-by-name \"n00017\")
 ;=> NIL, NIL
 "
-  (list 
-   (format nil "~{~A~^.~}"
-	   (loop for i across
-		(sb-bsd-sockets:host-ent-address
-		 (sb-bsd-sockets:get-host-by-name name))
-	      collect i))))
+  (handler-case
+      (loop for i across
+	   (sb-bsd-sockets:host-ent-address
+	    (sb-bsd-sockets:get-host-by-name name))
+	 collect i)
 
-
-
+    (SB-BSD-SOCKETS:SOCKET-ERROR (condition) (values nil condition))     
+    (ERROR (condition) (values nil condition))
+    (:no-error (varN-1 ) (list (format nil "~{~A~^.~}" varN-1)))))
