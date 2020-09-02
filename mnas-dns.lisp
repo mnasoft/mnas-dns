@@ -1,11 +1,11 @@
 ;;;; mnas-dns.lisp
 
 (in-package #:mnas-dns)
-(annot:enable-annot-syntax)
 
 ;;; "mnas-dns" goes here. Hacks and glory await!
 
-@export
+(export 'ip-by-name )
+
 (defun ip-by-name (name)
   "Выполняет определение IP-адреса ПК по его имени;
 Возвращает:
@@ -27,12 +27,16 @@
     (ERROR (condition) (values nil condition))
     (:no-error (varN-1 ) (list (format nil "~{~A~^.~}" varN-1)))))
 
-@export
+(export '*nginx-conf-dir*)
+
 (defparameter *nginx-conf-dir* "D:/PRG/nginx-bin/conf")
 
-@export
-@annot.doc:doc
-"@b(Описание:) функция @b(nginx-by-ip-allow&deny-all) записывает в файл с 
+(export 'nginx-by-ip-allow&deny-all )
+
+(defun nginx-by-ip-allow&deny-all (ip-lst
+				   &optional
+				     (fname (concatenate 'string *nginx-conf-dir* "/" "server.blacklist")))
+  "@b(Описание:) функция @b(nginx-by-ip-allow&deny-all) записывает в файл с 
 именем fname разрешения на доступ к серверу, работающему под управлением nginx.
 
 Для того, чтобы сервер воспринял это необходимо включить директиву  include
@@ -51,18 +55,17 @@ http {
  (nginx-by-ip-allow&deny-all '(\"192.168.0.100\"))
 @end(code)
  "
-(defun nginx-by-ip-allow&deny-all
-    (ip-lst
-     &optional
-       (fname (concatenate 'string *nginx-conf-dir* "/" "server.blacklist")))
   (with-open-file
       (os fname :direction :output :if-exists :supersede :external-format :utf8)
     (format os "~{allow ~A;~%~}~%deny all;" ip-lst)
     (format nil "См. файл ~A~%~{allow ~A;~%~}~%deny all;" fname ip-lst)))
 
-@export
-@annot.doc:doc
-"@b(Описание:) функция @b(nginx-by-ip-allow&deny-all) записывает в файл с 
+(export 'nginx-by-compnames-allow&deny-all )
+
+(defun nginx-by-compnames-allow&deny-all (compnames
+					  &optional
+					    (fname (concatenate 'string *nginx-conf-dir* "/" "server.blacklist")))
+  "@b(Описание:) функция @b(nginx-by-ip-allow&deny-all) записывает в файл с 
 именем fname разрешения на доступ к серверу, работающему под управлением nginx.
 
 Для того, чтобы сервер воспринял это необходимо включить директиву  include
@@ -81,10 +84,6 @@ http {
  (nginx-by-ip-allow&deny-all '(\"n118383\"))
 @end(code)
  "
-(defun nginx-by-compnames-allow&deny-all
-    (compnames
-     &optional
-       (fname (concatenate 'string *nginx-conf-dir* "/" "server.blacklist")))
   (nginx-by-ip-allow&deny-all
    (mapcan #'(lambda (el) (mnas-dns:ip-by-name el)) compnames)
    fname))
