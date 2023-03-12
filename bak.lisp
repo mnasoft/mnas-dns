@@ -1,4 +1,4 @@
-(in-package #:mnas-dns)
+(in-package :mnas-dns)
 
 (defun ip-by-name (name)
   "Выполняет определение IP-адреса ПК по его имени;

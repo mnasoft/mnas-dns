@@ -1,6 +1,6 @@
 ;;;; package.lisp
 
-(defpackage #:mnas-dns
+(defpackage :mnas-dns
   (:use #:cl #:cl-ppcre)
   (:export ip-by-name))
 

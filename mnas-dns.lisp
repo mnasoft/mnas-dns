@@ -1,6 +1,6 @@
 ;;;; mnas-dns.lisp
 
-(in-package #:mnas-dns)
+(in-package :mnas-dns)
 
 ;;; "mnas-dns" goes here. Hacks and glory await!
 
